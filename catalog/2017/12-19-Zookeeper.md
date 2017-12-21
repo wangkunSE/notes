@@ -72,7 +72,7 @@
 
 ##### 2.1.2 3PC
 
-> 分为：CanCommit，PreCommit，DoCommit阶段。比2PC多加了一个CanCommit阶段。
+> 分为：CanCommit，PreCommit，DoCommit阶段。比2PC多加了一个PreCommit阶段。
 >
 > 进入阶段三后如果出现这两种故障：
 >
@@ -124,7 +124,7 @@
 > 1. Proposer 选择一个新的提案编号Mn，然后向某个Acceptor集合的成员发送请求，要求该集合中的Acceptor做出如下回应。
 >    - 向Proposer承诺，保证不再批准任何编号小于Mn的提案
 >    - 若Acceptor已经批准过任何提案，那么其就向Proposer反馈当前该Acceptor接受的编号小于Mn但为最大编号的那个提案值。
-> 2. 如果Proposer收到了来自半数以上的Acceptor的响应结果，那么它就可以产生编号为Mn、Value值为Vn的提案。这里的Vn是所有响应中编号最大的提案的Value值。当然还存在另一种情况：还没有任何提议，这是该Proposer可以提出任何提议。
+> 2. 如果Proposer收到了来自半数以上的Acceptor的响应结果，那么它就可以产生编号为Mn、Value值为Vn的提案。这里的Vn是所有响应中编号最大的提案的Value值。当然还存在另一种情况：还没有任何提议，这时该Proposer可以提出任何提议。
 
 **Acceptor批准提案：**
 
@@ -185,7 +185,7 @@
 
 > 锁延迟：因为网络原因则Chubby为原客户端保留一段时间锁。
 >
-> 锁序列器：锁名称，锁模式，锁序号。客户端在请求时携带，服务端丢弃检验不通过的锁。
+> 锁序列器：锁名称，锁模式，锁序号。客户端在请求时携带，服务端丢弃检验不通过的锁请求。
 
 **Chubby中的事件通知机制**
 
@@ -197,3 +197,92 @@
 **会话和会话激活**
 
 > 客户端会在建立连接后发送一个KeepAlive请求，服务端会在会话租期时间内阻塞该请求。直到到达租期时间向客户端返回响应信息。当客户端处于危险状态（过了本地的会话租期但是还是没有收到服务端的keepAlive响应时），会清空本地缓存，并且会等待一个宽限期（45S）。Chubby Master故障恢复时同理，只是每一轮选举都会保留一个Master周期编号。
+
+##### 3.1.5 Paxos 协议实现
+
+> 日志副本的一致性原理：
+>
+> 每一个Paxos Instance都需要进行一轮或者多轮Prepare→Promise→Propose→Accept这样独立的二阶段请求完成对一个提案值的选定。
+>
+> - 当某副本节点通过选举成为Master后，就会使用新分配的编号N来广播一个Prepare消息。
+> - 当Acceptor接收到Prepare消息后，必须对多个Instance同时做出回应（通过封装到一个数据包实现）。
+> - 然后拥有提案编号N的Master就可以进行下一个阶段Propose→Accept。若Master发现Acceptor返回了一个Reject消息，说明集群存在另一个Master，且试图使用更大的提案编号（比如M，M>N）发送prepare消息。这时当前Master就需要重新分配新的提案编号（要比M大）并再次进行Prepare→Promise阶段。
+>
+> 在每个Instance的运行过程中，一旦接收到多数派的Accept反馈后，就可以将对应的提案值写入本地事务日志并广播COMMIT消息给集群中的其他副本节点。
+
+#### 3.2 Hypertable
+
+##### 3.2.1 概述
+
+> 相比传统关系型数据库的优势：
+>
+> - 支持对大量并发请求的处理
+> - 支持对海量数据的管理
+> - 扩展性良好，在保证可用性的前提下，能够通过随意添加集群中的机器来实现水平扩容。
+> - 可用性极高，具有非常好的容错性。
+
+**架构**
+
+> Hyperspace(等同于Chubby的作用)，Master(记录元数据)，RangeServer(对外提供服务的组件单元，负责数据的读取和写入)，DFS Broker(底层分布式文件系统的抽象层，完成对文件系统的读写操作)
+
+##### 3.2.2 算法实现
+
+> BDB Hypertable中的Acceptor。
+
+### 四 ZooKeeper 与Paxos
+
+> ZooKeeper并没有直接采用Paxos算法，而是采用了一种被称为ZAB（ZooKeeper Atomic Broadcast）的一致性协议。
+
+#### 4.1 初识ZooKeeper
+
+##### 4.1.1 ZooKeeper介绍
+
+> ZooKeeper可以保证如下分布式一致性特性：
+>
+> - 顺序一致性
+> - 原子性
+> - 单一视图
+> - 可靠性
+> - 实时性
+>
+> ZooKeeper的设计目标：
+>
+> - 简单的数据模型（存储在内存中的由ZNode数据节点组成的类似于文件结构的数据模型）
+> - 可以构建集群
+> - 顺序访问
+> - 高性能
+
+##### 4.1.2 ZooKeeper来历
+
+> 雅虎研究院
+
+##### 4.1.3 ZooKeeper的基本概念
+
+> 集群角色：Leader（读写），Follower（读，参与选举leader），Observer（读）
+>
+> 数据节点（Znode）：永久节点，临时节点（客户端会话期），SEQUENTIAL（名称自增属性）
+>
+> 版本：version(当前ZNode的版本)，cversion（当其阿明ZNode子节点的版本），aversion（当前ZNode的ACL版本）
+>
+> ACL(Access Control Lists)：权限控制
+>
+> - CREATE、READ、WRITE、DELETE、ADMIN(设置节点ACL的权限)
+
+##### 4.1.4 为什么选择ZooKeeper
+
+> 成熟，开源，免费。
+
+#### 4.2 ZooKeeper的ZAB协议
+
+##### 4.2.1 ZAB协议
+
+> leader将客户端请求转换成一个事务Proposal，并将该Proposal分发给Follower服务器，若超过半数的Follower服务器进行了正确的反馈，Leader将向所有的Follower发送Commit信息。
+
+##### 4.2.2 协议介绍
+
+> 
+
+
+
+
+
