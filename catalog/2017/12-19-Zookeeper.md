@@ -262,7 +262,7 @@
 >
 > 数据节点（Znode）：永久节点，临时节点（客户端会话期），SEQUENTIAL（名称自增属性）
 >
-> 版本：version(当前ZNode的版本)，cversion（当其阿明ZNode子节点的版本），aversion（当前ZNode的ACL版本）
+> 版本：version(当前ZNode的版本)，cversion（当前ZNode子节点的版本），aversion（当前ZNode的ACL版本）
 >
 > ACL(Access Control Lists)：权限控制
 >
@@ -280,9 +280,75 @@
 
 ##### 4.2.2 协议介绍
 
-> 
+> 恢复模式：集群初启动，leader宕机，由于网络原因与过半Follower失去联系。
+>
+> 消息广播：ZXID(事务ID，全局唯一单调递增)
+>
+> 崩溃恢复：
+>
+> - ZAB协议要确保在leader崩溃前发出的事务提交命令在所有的服务器上都被提交成功。
+> - ZAB协议需要确保丢弃那些只在Leader服务器上被提出的事务
+>
+> 数据同步：ZXID（低32位是Proposal自增的一个计数器，高32位代表了Leader周期的epoch编号，当更换leader周期时会从中解析出epoch编号并加一）
 
+##### 4.2.3 深入ZAB协议
 
+**系统模型**
 
+> $$
+> \land  \forall Q, Q\subseteq \prod
+> $$
+>
+> $$
+> \land \forall Q_1 和 Q_2,Q_1\bigcap Q_2 \neq \emptyset
+> $$
+>
+> 完整性：若进程Pj收到来自进程Pi的消息m，则Pi一定发送了消息m
+>
+> 前置性：若消息m的前置消息为m‘，那么Pj一定先收到m’再收到m。
 
+**问题描述**
 
+> 选举机制和消息广播机制相当重要。
+
+**主进程周期**
+
+> ready(e（当前的主进程周期）)函数，告诉进程充分完成了崩溃恢复阶段。
+
+**事务**
+
+> transactions(v(事务内容),z(事务标识)< e(主进程周期),c(主进程周期内的事务计数) >)。
+>
+> epoch(z)：事务标识中的主进程周期epoch，counter(z)：事务标识中的事务计数。
+
+**算法描述：**
+
+> ZAB协议两过程：消息广播和崩溃恢复。（Discovery，Synchronization，Broadcast）
+>
+> **发现：**
+>
+> 1. Follower F将自己最后接受的事务Proposal的Proposal的epoch值发送给准Leader L。
+> 2. 当收到来自过半Follower的CEPOCH(Fp)消息后，准Leader L会生成NEWEPOCH(e')消息给这些过半的Follower。该epoch的值e‘为Follower返回消息的最大的epoch值加一。
+> 3. Follower检查自身的CEPOCH(Fp)值是否小于e’，若小于就会将该值赋值为e‘，并向Leader发送Ack消息。
+>
+> **同步：**
+>
+> 1. Leader L会将e'和Ie’发送给所有Quorum中的Follower。
+> 2. Follower接收到Leader L的信息后，对比e'和CEPOCH（Fp）的值，若不同，则不参与本轮同步，若相同，就会将Ie‘中的事务接受。
+> 3. Leader接受到来自过半Follower的反馈信息后，就会向所有Follower发送Commit信息。
+> 4. Follower收到信息后提交。
+>
+> **广播：**
+>
+> 1. Leader L收到客户端的新事务请求后，生成Proposal并根据ZXID的顺序向所有Follower发送提案。
+> 2. Follower根据顺序处理Proposal。并追加到hf中，并反馈给Leader。
+> 3. 当Leader收到过半的反馈时就会让所有的Follower提交事务。
+> 4. Follower收到信息后就会提交事务，但当前事务的前置事务必定已经提交。
+
+##### 4.2.4 ZAB与Paxos算法的联系与区别
+
+> 主要区别在于设计目标：
+>
+> ZAB协议：构建一个高可用的分布式数据主备系统
+>
+> Paxos算法：构建一个分布式一致性状态机系统。
