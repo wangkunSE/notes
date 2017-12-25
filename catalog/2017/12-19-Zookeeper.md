@@ -333,8 +333,8 @@
 >
 > **同步：**
 >
-> 1. Leader L会将e'和Ie’发送给所有Quorum中的Follower。
-> 2. Follower接收到Leader L的信息后，对比e'和CEPOCH（Fp）的值，若不同，则不参与本轮同步，若相同，就会将Ie‘中的事务接受。
+> 1. Leader L会将e'和Ie’（准Leader的hf（历史事务集合））发送给所有Quorum中的Follower。
+> 2. Follower接收到Leader L的信息后，对比e'和CEPOCH（Fp（Follower f处理过的最后一个事务Proposal））的值，若不同，则不参与本轮同步，若相同，就会将Ie‘中的事务接受。
 > 3. Leader接受到来自过半Follower的反馈信息后，就会向所有Follower发送Commit信息。
 > 4. Follower收到信息后提交。
 >
@@ -352,3 +352,46 @@
 > ZAB协议：构建一个高可用的分布式数据主备系统
 >
 > Paxos算法：构建一个分布式一致性状态机系统。
+
+### 五 使用ZooKeeper
+
+#### 5.1 部署与运行
+
+> 集群配置文件
+>
+> zoo.cfg
+>
+> ```properties
+> # The number of milliseconds of each tick
+> tickTime=2000
+> # The number of ticks that the initial 
+> # synchronization phase can take
+> initLimit=10
+> # The number of ticks that can pass between 
+> # sending a request and getting an acknowledgement
+> syncLimit=5
+> # the directory where the snapshot is stored.
+> # do not use /tmp for storage, /tmp here is just 
+> # example sakes.
+> dataDir=/var/lib/zookeeper/
+> # the port at which the clients will connect
+> clientPort=2181
+> # the maximum number of client connections.
+> # increase this if you need to handle more clients
+> #maxClientCnxns=60
+> #
+> # Be sure to read the maintenance section of the 
+> # administrator guide before turning on autopurge.
+> #
+> # http://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_maintenance
+> #
+> # The number of snapshots to retain in dataDir
+> #autopurge.snapRetainCount=3
+> # Purge task interval in hours
+> # Set to "0" to disable auto purge feature
+> #autopurge.purgeInterval=1
+> server.1=192.168.241.152:2888:3888
+> server.2=192.168.241.153:2888:3888
+> server.3=192.168.241.154:2888:3888
+> ```
+
