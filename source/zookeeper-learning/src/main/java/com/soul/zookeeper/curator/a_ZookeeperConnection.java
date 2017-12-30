@@ -31,8 +31,8 @@ public class a_ZookeeperConnection {
         client.start();
         client.create()
                 .creatingParentsIfNeeded()
-                .withMode(CreateMode.EPHEMERAL).forPath("/zk-test", "".getBytes());
-        List<String> list = client.getChildren().forPath("/");
+                .withMode(CreateMode.EPHEMERAL).forPath("/zk-test", "init".getBytes());
+        List<String> list = client.getChildren().forPath("/zk-test");
         System.out.println(list);
         Thread.sleep(Integer.MAX_VALUE);
 
