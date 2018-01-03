@@ -16,8 +16,8 @@ public class a_ArrayListThreadSafe {
     public static void main(String[] args) throws InterruptedException {
 
         final List list = new ArrayList<String>();
-        listAdd(list,5);
-        listGet(list,5);
+        listAdd(list,8);
+        listGet(list,3);
         countDownLatch.countDown();
         count.await();
         System.out.println(list);
@@ -33,8 +33,7 @@ public class a_ArrayListThreadSafe {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-
-                    System.out.println(Thread.currentThread().getName()+"读取到了："+list.get(0));
+                    System.out.println(Thread.currentThread().getName()+"读取到了："+list.remove(0));
                     count.countDown();
                 }
             }).start();
