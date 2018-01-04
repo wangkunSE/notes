@@ -76,4 +76,57 @@
 
 ### 三 Netty的组件和设计
 
-> 
+> netty实现了将程序逻辑从网络层解耦，同事保证了高负载下应用程序性能的最大化和可伸缩性。
+
+#### 3.1 Channel、EventLoop、和ChannelFuture
+
+> - Channel - Socket
+> - EventLoop - 控制流、多线程处理、并发
+> - ChannelFuture - 异步通知
+
+##### 3.1.1 Channel接口
+
+> - EmbeddedChannel；
+> - LocalServerChannel；
+> - NioDatagramChannel；
+> - NioSctpChannel；
+> - NioSocketChannel。
+
+##### 3.1.2 EventLoop接口
+
+> - 一个EventLoopGroup包含一个或者多个EventLoop
+> - 一个EventLoop在它的生命周期内之和一个Thread进行绑定
+> - 所有由EventLoop处理I/O事件都将在它专有的Thread上被处理
+> - 一个Channel在它的生命周期内只注册于一个EventLoop
+> - 一个EventLoop可能会被分配给一个或多个Channel
+
+##### 3.1.3 ChannelFuture 接口
+
+> ChannelFutureListenser ，使得在某个操作完成时得到通知
+
+#### 3.2 ChannelHandler 和ChannelPipeline
+
+##### 3.2.1 ChannelHandler 接口
+
+> ChannelHandler充当了所有处理入站和出站数据的应用程序逻辑的容器。
+
+##### 3.2.2 ChannelPipeline 接口
+
+> ChannelPipeline提供了ChannelHandler链的容器，并定义了用于在该链上传播入站和出站事件流的API。
+
+##### 3.3.3 深入理解ChannelHandler
+
+>  ChannelHandlerAdapter
+>  ChannelInboundHandlerAdapter
+>  ChannelOutboundHandlerAdapter
+>  ChannelDuplexHandler
+>
+> 适配器类可以将编写自定义的ChannelHandler所需要的努力降到最低。
+
+##### 3.2.4 编码器和解码器
+
+> 也是ChannelHandler的实现
+
+#### 3.3 引导
+
+> 服务端要多一个EventLoopGroup专门用来处理连接。
