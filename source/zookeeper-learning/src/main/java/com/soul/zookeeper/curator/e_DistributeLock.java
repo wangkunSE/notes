@@ -9,6 +9,7 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.locks.ReentrantLock;
 
 /***
  * @author wangkun1
@@ -24,7 +25,7 @@ public class e_DistributeLock {
 
     static String LOCK_PATH = Constants.ROOT_PATH + "/lock";
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws Exception {
         client.start();
         final InterProcessMutex lock = new InterProcessMutex(client, LOCK_PATH);
         final CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -49,6 +50,9 @@ public class e_DistributeLock {
                 }
             }).start();
         }
+
+        ReentrantLock lock1 = new ReentrantLock();
+        lock1.lock();
         countDownLatch.countDown();
     }
 }
