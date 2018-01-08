@@ -498,3 +498,41 @@
 
 > YARN是hadoop为了提高计算节点Master（JT）的扩展性，同时为了支持多计算模型和提供资源的细粒度调度而引入的全新一代分布式调度框架。
 
+**ResourceManager HA**
+
+> 为了解决单点问题，YARN设计了一套Active/Standby模式的架构。
+
+**Fencing（隔离）**
+
+> 脑裂：有多个指挥者
+>
+> 对需要竞争的数据节点加ACL权限控制机制来实现不同RM之间的隔离。
+
+##### 6.2.2 HBase
+
+> 全称Hadoop Database，是Google Bigtable的开源实现，是一个基于HDFS设计的面向海量数据的高可靠性、高性能、面向列、可伸缩的分布式存储系统。
+
+**系统冗错**
+
+> 当HBase启动时，每个RegionServer服务器都会到ZooKeeper的/hbase/rs节点下创建一个信息节点。
+>
+> 之所以不用传统的TCP心跳连接机制，是因为如果那样，HMaster的管理负担会越来越重，另外它自身也有挂掉的可能。
+
+**RootRegion 管理**
+
+> 对于HBase集群来说，数据存储的位置信息是记录在元数据分片，也就是RootRegion上。每次客户端发起新的请求，就需要知道数据的位置，就会去查询RootRegion。
+
+**Region 状态管理**
+
+> Region 是HBase中数据的物理切片，每个Region中记录了全局数据的一小部分，并且不同的Region之间的数据是相互不重复的。
+
+**分布式SplitLog任务管理**
+
+> 多个RegionServer服务器处理HLog的恢复工作的协助，任务分配与状态更改。
+
+**Replication管理**
+
+> HBase借助ZooKeeper来完成Replication功能。通过在ZooKeeper上记录一个replication结点。然后把不同的RegionServer服务器对应的HLog文件名称记录到相应的节点上，HMaster集群会将新增的数据推送到Slave集群。
+
+#### 6.2.3 Kafka
+
