@@ -10,4 +10,5 @@ public class Constants {
 //    public static final String ZOOKEEPER_FAKE_CLUSTER_SERVER_PATH = "192.168.154.151:2181,192.168.154.151:2182,192.168.154.151:2183";
     public static final String ZOOKEEPER_FAKE_CLUSTER_SERVER_PATH = "192.168.241.151:2181,192.168.241.151:2182,192.168.241.151:2183";
     public static final String ROOT_PATH = "/zk-test";
+    public static final String MY_LOCK = "lock";
 }

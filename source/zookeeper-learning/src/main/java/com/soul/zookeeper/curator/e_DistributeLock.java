@@ -10,11 +10,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 
+import static com.soul.zookeeper.constants.Constants.MY_LOCK;
+
 /***
  * @author wangkun1
  * @version 2018/1/2 
  */
 public class e_DistributeLock {
+
+
 
     static CuratorFramework client = CuratorFrameworkFactory.builder()
             .connectionTimeoutMs(5000)
@@ -25,6 +29,11 @@ public class e_DistributeLock {
     static String LOCK_PATH = Constants.ROOT_PATH + "/lock";
 
     public static void main(String[] args) throws Exception {
+        new e_DistributeLock().lockDemo();
+    }
+
+    private void lockDemo() {
+
         client.start();
         final InterProcessMutex lock = new InterProcessMutex(client, LOCK_PATH);
         final CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -32,15 +41,13 @@ public class e_DistributeLock {
             new Thread(() -> {
                 try {
                     countDownLatch.await();
-                    lock.acquire();
+//                    lock.acquire();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss|SSS");
-                String format = sdf.format(new Date());
-                System.out.println("生成的订单号是："+format);
+                createOrder();
                 try {
-                    lock.release();
+//                    lock.release();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -48,5 +55,13 @@ public class e_DistributeLock {
         }
 
         countDownLatch.countDown();
+    }
+
+    private void createOrder() {
+        synchronized (MY_LOCK) {
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss|SSS");
+            String format = sdf.format(new Date());
+            System.out.println("生成的订单号是：" + format);
+        }
     }
 }
