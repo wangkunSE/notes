@@ -9,7 +9,6 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.locks.ReentrantLock;
 
 /***
  * @author wangkun1
@@ -30,29 +29,24 @@ public class e_DistributeLock {
         final InterProcessMutex lock = new InterProcessMutex(client, LOCK_PATH);
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         for (int i = 0; i < 30; i++) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        countDownLatch.await();
-                        lock.acquire();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss|SSS");
-                    String format = sdf.format(new Date());
-                    System.out.println("生成的订单号是："+format);
-                    try {
-                        lock.release();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+            new Thread(() -> {
+                try {
+                    countDownLatch.await();
+                    lock.acquire();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss|SSS");
+                String format = sdf.format(new Date());
+                System.out.println("生成的订单号是："+format);
+                try {
+                    lock.release();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }).start();
         }
 
-        ReentrantLock lock1 = new ReentrantLock();
-        lock1.lock();
         countDownLatch.countDown();
     }
 }
