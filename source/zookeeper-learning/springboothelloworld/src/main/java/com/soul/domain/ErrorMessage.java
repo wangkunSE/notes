@@ -36,6 +36,7 @@ public class ErrorMessage {
 
         FailEnum(String msg, int code) {
             this.code = code;
+            this.msg = msg;
         }
         private Integer code;
         private String msg;

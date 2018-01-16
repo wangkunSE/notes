@@ -1,21 +1,22 @@
-package com.soul;
+package com.soul.web;
 
 import com.soul.domain.ErrorMessage;
 import com.soul.domain.User;
 import com.soul.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.ErrorController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.ModelAndView;
 
 /***
  * @author wangkun1
  * @version 2018/1/12 
  */
 @RestController
-public class UserController {
+public class UserController implements ErrorController {
 
+    private final String PATH = "/error";
     private UserService userService;
 
     @Autowired
@@ -23,15 +24,20 @@ public class UserController {
         this.userService = userService;
     }
 
-    @RequestMapping(value = {"/","/index.html"})
+    @RequestMapping(value = {"/", "/index.html"})
     @ResponseBody
-    public User loginPage(String userName){
+    public User loginPage(String userName) {
         return userService.getUser(userName);
     }
 
-    @RequestMapping(value = "/error")
+    @RequestMapping(value = PATH)
     @ResponseBody
-    public ErrorMessage error(){
-        return new  ErrorMessage(ErrorMessage.FailEnum.FAIL_ENUM);
+    public ErrorMessage error() {
+        return new ErrorMessage(ErrorMessage.FailEnum.FAIL_ENUM);
+    }
+
+    @Override
+    public String getErrorPath() {
+        return PATH;
     }
 }
