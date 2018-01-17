@@ -21,8 +21,18 @@ public class UserService {
         this.userDao = userDao;
     }
 
-    public User getUser(String userName){
-
+    public User getUser(String userName) {
+        printClassLoader(Thread.currentThread().getContextClassLoader(), 1);
         return userDao.findUserByUserName(userName);
+    }
+
+    private void printClassLoader(ClassLoader currentClassLoader, int n) {
+        if (currentClassLoader != null) {
+            printClassLoader(currentClassLoader.getParent(), n + 1);
+            for (int i = 0; i <= n; i++) {
+                System.out.print("--");
+            }
+            System.out.println("CurrentClassLoader : " + currentClassLoader);
+        }
     }
 }
