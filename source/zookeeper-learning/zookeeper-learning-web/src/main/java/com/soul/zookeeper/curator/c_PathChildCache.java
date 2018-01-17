@@ -8,6 +8,7 @@ import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.data.Stat;
 
 import java.util.List;
 
@@ -24,21 +25,21 @@ public class c_PathChildCache {
             .build();
 
     public static void main(String[] args) throws Exception {
-//        childrenEvent();
-        createChild();
+        childrenEvent();
+//        createChild();
     }
 
     private static void createChild() throws Exception {
         client.start();
         client.create()
                 .withMode(CreateMode.EPHEMERAL)
-                .forPath("/zk-test/child-event/c3","c3".getBytes());
+                .forPath("/zk-test/child-event/c3", "c3".getBytes());
         client.create()
                 .withMode(CreateMode.EPHEMERAL)
-                .forPath("/zk-test/child-event/c1","c1".getBytes());
+                .forPath("/zk-test/child-event/c1", "c1".getBytes());
         client.create()
                 .withMode(CreateMode.EPHEMERAL)
-                .forPath("/zk-test/child-event/c2","c2".getBytes());
+                .forPath("/zk-test/child-event/c2", "c2".getBytes());
 
         List<String> list = client.getChildren().forPath("/zk-test/child-event");
         System.out.println(list);
@@ -75,6 +76,9 @@ public class c_PathChildCache {
         client.create().creatingParentsIfNeeded()
                 .withMode(CreateMode.PERSISTENT)
                 .forPath(Constants.ROOT_PATH + "/c1", "".getBytes());
+        Thread.sleep(1000);
+        Stat stat = client.setData().forPath(Constants.ROOT_PATH + "/c1", "init".getBytes());
+        System.out.println(stat);
         Thread.sleep(1000);
         client.delete().deletingChildrenIfNeeded()
                 .forPath(Constants.ROOT_PATH + "/c1");
