@@ -26,30 +26,39 @@ public class ZKUtils {
     public void setZookeeperServer(String zookeeperServer) {
         this.zookeeperServer = zookeeperServer;
     }
+
     public String getZookeeperServer() {
         return zookeeperServer;
     }
+
     public void setSessionTimeoutMs(int sessionTimeoutMs) {
         this.sessionTimeoutMs = sessionTimeoutMs;
     }
+
     public int getSessionTimeoutMs() {
         return sessionTimeoutMs;
     }
+
     public void setConnectionTimeoutMs(int connectionTimeoutMs) {
         this.connectionTimeoutMs = connectionTimeoutMs;
     }
+
     public int getConnectionTimeoutMs() {
         return connectionTimeoutMs;
     }
+
     public void setBaseSleepTimeMs(int baseSleepTimeMs) {
         this.baseSleepTimeMs = baseSleepTimeMs;
     }
+
     public int getBaseSleepTimeMs() {
         return baseSleepTimeMs;
     }
+
     public void setMaxRetries(int maxRetries) {
         this.maxRetries = maxRetries;
     }
+
     public int getMaxRetries() {
         return maxRetries;
     }
@@ -73,7 +82,7 @@ public class ZKUtils {
         try {
             String rootPath = "/" + "services";
             String hostAddress = InetAddress.getLocalHost().getHostAddress();
-            String serviceInstance = "prometheus" + "-" +  hostAddress + "-";
+            String serviceInstance = "prometheus" + "-" + hostAddress + "-";
             client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL_SEQUENTIAL).forPath(rootPath + "/" + serviceInstance);
         } catch (Exception e) {
         }
