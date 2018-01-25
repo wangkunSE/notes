@@ -40,4 +40,8 @@ public class UserController implements ErrorController {
     public String getErrorPath() {
         return PATH;
     }
+
+    public static void main(String[] args) {
+        System.out.println(org.apache.commons.lang.StringUtils.isNumeric(""));
+    }
 }
