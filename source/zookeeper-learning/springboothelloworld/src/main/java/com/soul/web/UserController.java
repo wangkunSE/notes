@@ -1,5 +1,6 @@
 package com.soul.web;
 
+import com.google.common.collect.Lists;
 import com.soul.domain.ErrorMessage;
 import com.soul.domain.User;
 import com.soul.service.UserService;
@@ -8,6 +9,9 @@ import org.springframework.boot.autoconfigure.web.ErrorController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Collections;
+import java.util.List;
 
 /***
  * @author wangkun1
@@ -42,6 +46,13 @@ public class UserController implements ErrorController {
     }
 
     public static void main(String[] args) {
-        System.out.println(org.apache.commons.lang.StringUtils.isNumeric(""));
+//        System.out.println(org.apache.commons.lang.StringUtils.isNumeric(""));
+        List<String> list = Lists.newArrayList();
+        list.add(null);
+        list.add("Jack");
+        list.add(null);
+        System.out.println(list);
+        list.removeAll(Collections.singleton(""));
+        System.out.println(list);
     }
 }
