@@ -25,35 +25,29 @@ public class a_ArrayListThreadSafe {
 
     private static void listGet(final List list, int threadNum) {
         for (int i = 0; i < threadNum; i++) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        countDownLatch.await();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    System.out.println(Thread.currentThread().getName()+"读取到了："+list.remove(0));
-                    count.countDown();
+            new Thread(() -> {
+                try {
+                    countDownLatch.await();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
+                System.out.println(Thread.currentThread().getName()+"读取到了："+list.remove(0));
+                count.countDown();
             }).start();
         }
     }
 
     private static void listAdd(final List list,int threadNum) {
         for (int i = 0; i < threadNum; i++) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        countDownLatch.await();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    list.add("lll"+ Thread.currentThread().getName());
-                    System.out.println(Thread.currentThread().getName()+"添加了内容...");
-                    count.countDown();
+            new Thread(() -> {
+                try {
+                    countDownLatch.await();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
+                list.add("lll"+ Thread.currentThread().getName());
+                System.out.println(Thread.currentThread().getName()+"添加了内容...");
+                count.countDown();
             }).start();
         }
     }
