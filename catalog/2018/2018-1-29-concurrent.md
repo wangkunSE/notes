@@ -60,3 +60,7 @@ public class UnsafeSequence{
 ### 二 线程安全性
 
 > 一个对象是否需要是线程安全的，取决于它是否被多个线程访问。这指的是访问对象的方式，而不是对象要实现的功能。
+
+**Java中的主要同步机制**:
+
+> synchronized（独占的加锁方式），volatile，显式锁（Explicit Lock）以及原子变量
