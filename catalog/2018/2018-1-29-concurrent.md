@@ -63,4 +63,90 @@ public class UnsafeSequence{
 
 **Java中的主要同步机制**:
 
-> synchronized（独占的加锁方式），volatile，显式锁（Explicit Lock）以及原子变量
+> synchronized（独占的加锁方式），volatile，显式锁（Explicit Lock）以及原子变量。
+
+> 线程安全性是一个在代码上使用的术语，但它只是与状态相关，因此只能应用于**封装其状态**的整个代码，这可能是一个对象，也可能是整个程序。
+
+#### 2.1 什么是线程安全性
+
+**正确性** ：某个类的行为与其规范完全一致。
+
+**线程安全性** ：当多个线程访问某个类时，这个类始终都能表现出正确的行为，则这个类就是线程安全的。
+
+**无状态对象一定是线程安全的。**
+
+#### 2.2 原子性
+
+**竞态条件（Race Condition）：**由于不恰当的执行时序而出现不正确的结果。
+
+##### 2.2.1 竞态条件
+
+> 得到正确结果必须取决于事件的发生时序。
+
+**先检查后执行：**首先观察到某个条件为真，然后根据观察结果采用相应的动作。
+
+##### 2.2.2 延迟初始化中的竞态条件
+
+```java
+@NotThreadSafe
+public class LazyInitRace{
+  private ExpensiveObject instance = null;
+  
+  public ExpensiveObject getInstance(){
+    if( null == instance){
+      instance = new ExpensiveObject();
+    }
+    return instance;
+  }
+}
+```
+
+##### 2.2.3 复合操作
+
+> 原子操作是指，对于访问同一个状态的所有操作（包括该操作本身）来说。这个操作是一个以原子方式执行的操作。
+
+**复合操作：**包含了一组必须以原子方式执行的操作以确保线程安全性。
+
+> 在实际并发编程中，应尽可能地使用现有的线程安全对象来管理类的状态。
+
+#### 2.3 加锁机制
+
+> **要保持状态的一致性，就需要在单个原子操作中更新所有相关的状态变量。**
+
+##### 2.3.1 内置锁
+
+> 以关键字synchronized来修饰的方法就是一种横跨整个方法体的同步代码块，其中该同步代码块的锁就是方法调用所在的对象。Java的内置锁相当于一种**互斥体（或互斥锁）**。即线程A尝试获取一个由线程B持有的锁时，线程A必须等待或者阻塞，直到线程B释放这个锁。
+
+##### 2.3.2 重入
+
+> 内置锁是可重入的。这意味着获取锁的操作粒度是“线程”，而不是“调用”。
+
+```java
+public class Widget{
+  public synchronized void doSomething(){
+    //...
+  }
+}
+public class LoggingWidget extends Widget{
+  public synchronized void doSomething(){
+    System.out.println(toString()+" :calling doSomething.");
+    super.doSomething(); //若内置锁不可重入，则该方法会产生死锁。    
+  }
+}
+```
+
+#### 2.4 用锁来保护状态
+
+> 对于可能被多个线程同时访问的可变状态变量，在访问它时都需要持有同一个锁，在这种情况下，我们称状态变量是由这个锁保护的。
+
+> 每个共享的和可变的变量都应该只由一个锁来保护，从而使维护人员知道是哪一个锁。
+
+> 对于每个包含多个变量的不变性条件，其中涉及的所有变量都需要由同一个锁来保护。
+
+#### 2.5 活跃性与性能
+
+![Poor Concurrency](./images/concurrent/2.1.jpg)
+
+> 通常，在简单性和性能之间存在着相互制约因素。
+
+> **当执行时间较长的计算或者可能无法快速完成的操作时（网络I/O、控制台I/O），一定不要持有锁**
