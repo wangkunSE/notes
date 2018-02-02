@@ -8,6 +8,7 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
 import static com.soul.zookeeper.constants.Constants.MY_LOCK;
@@ -101,6 +102,7 @@ public class e_DistributeLock {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                ConcurrentHashMap
                 String format = sdf.format(new Date());
                 System.out.println(Thread.currentThread().getName() + "生成的订单号是：" + format);
                 value++;
