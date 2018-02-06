@@ -8,9 +8,7 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import static com.soul.zookeeper.constants.Constants.MY_LOCK;
 
