@@ -641,3 +641,59 @@ public class SafePoint{
 ##### 5.5.3 信号量
 
 > 计数信号量用来控制同时访问某个特定资源的操作数量，或者同事执行某个指定操作的数量。其可以用来实现某种资源池，或者对容器施加边界。
+>
+> Semaphore管理着一组虚拟的许可，许可的初始数量可通过构造函数来指定。
+>
+> **可以用来构造数据库连接池。**
+
+```java
+/**
+     * 通过Semaphore为set做边界
+     * @param <T>
+     */
+    public static class BoundedHashSet<T> {
+        private final Set<T> set;
+        private final Semaphore sem;
+
+        public BoundedHashSet(int bound) {
+            this.set = Collections.synchronizedSet(new HashSet<T>());
+            this.sem = new Semaphore(bound);
+        }
+
+        public boolean add(T o) throws InterruptedException {
+            sem.acquire();
+            boolean wasAdd = false;
+            try {
+                wasAdd = set.add(o);
+                return wasAdd;
+            } finally {
+                if (!wasAdd) {
+                    sem.release();
+                }
+            }
+        }
+
+        public boolean remove(T o) {
+            boolean wasRemoved = set.remove(o);
+            if (wasRemoved) {
+                sem.release();
+            }
+            return wasRemoved;
+        }
+
+        @Override
+        public String toString() {
+            return set.toString();
+        }
+    }
+```
+
+##### 5.5.4 栅栏
+
+> 栅栏（Barrier类似于闭锁），他能阻塞一组线程知道某个事件发生。栅栏和闭锁的关键区别在于闭锁等待事件，栅栏等待线程。CyclicBarrier可以使一定数量的参与方反复地在栅栏位置汇集。
+>
+> Exchanger，构成一对栅栏，可以应用它进行交换数据。
+
+#### 5.6 构建高效且可伸缩的结果缓存
+
+> 
