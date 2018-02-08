@@ -649,3 +649,28 @@
 
 #### 6.3.4 分布式数据库同步系统:Otter
 
+> 分布式数据库同步系统
+
+**分布式SEDA（Staged Event-Driven Architecture）模型调度**
+
+> Otter同步流程的ETL处理模型
+>
+> - Select：数据接入
+> - Extract：数据提取
+> - Transform：数据转换
+> - Load：数据载入
+
+**Stage管理**
+
+> 主要就是维护一组工作线程，在接收到Schedule的Event后分配线程处理任务并反馈信息到Schedule。
+
+**Schedule调度**
+
+> 1. 创建节点
+> 2. 任务分配
+> 3. 任务通知
+> 4. 任务完成
+
+#### 6.3.5 轻量级分布式通用搜索平台：终搜
+
+#### 6.3.6 实时计算引擎：JStorm
