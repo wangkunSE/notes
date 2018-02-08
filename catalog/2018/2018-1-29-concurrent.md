@@ -696,4 +696,41 @@ public class SafePoint{
 
 #### 5.6 构建高效且可伸缩的结果缓存
 
+**HashMap版本：**
+
+![HashMap](./images/concurrent/5.6.1.jpg)
+
+**ConcurrentHashMap版本：**
+
+![ConcurrentHashMap](./images/concurrent/5.6.2.jpg)
+
+**ConcurrentHashMap+FutureTask版本：**
+
+![ConcurrentHashMap+FutureTask](./images/concurrent/5.6.3.jpg)
+
+**上述问题可以用ConcurrentHashMap#putIfAbsent解决**
+
+#### 第一部分小结
+
+> **"并发技巧清单":**
+>
+> - 可变状态是至关重要的（It's the mutable state, stupid）
+> - 尽量将域声明为final，除非需要它们是可变的。
+> - 不可变对象一定是线程安全的
+> - 用锁来保护每个可变变量
+> - 当保护同一个不变性条件中的所有变量时，需使用同一个锁
+> - 在执行复合操作期间，需持有锁
+> - 如果从多线程中访问同一个可变变量时没有同步机制，那么程序会出现问题。
+> - 不要故作聪明地推断出不需要使用同步
+> - 在设计过程中考虑线程安全，或者在文档中明确地指出它不是线程安全的。
+> - 将同步策略文档化。
+
+### 六 任务执行
+
+#### 6.1 在线程中执行任务
+
+> 服务器应当同时表现出良好的吞吐量和快速的响应性。当负荷过载时，应用程序的性能应当是逐渐降低，而不是直接失败。
+
+##### 6.1.1 串行地执行任务
+
 > 
