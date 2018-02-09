@@ -733,4 +733,168 @@ public class SafePoint{
 
 ##### 6.1.1 串行地执行任务
 
-> 
+> ```java
+> class SingleThreadWebServer{
+>   public static void main(String[] args) throws IOException{
+>     ServerSocket socket = new ServerSocket(80);
+>     while(true){
+>       Socket connection = socket.accept();
+>       handleRequest(connection);
+>     }
+>   }
+> }
+> ```
+>
+> 单线程，逻辑没问题，但是并发性极差。
+
+##### 6.1.2 显示地为任务创建线程
+
+> 可以提高更快的响应性和更高的吞吐率，正常负载情况下能提升性能。但是要考虑线程安全性。
+
+##### 6.1.3 无限制创建线程的不足
+
+> "为每个任务分配一个线程"这种方法存在一些缺陷：
+>
+> - 线程生命周期的开销非常高
+> - 资源消耗：大量空闲的线程会占用许多内存。
+> - 稳定性：在可创建线程的数量上存在一个限制。由JVM，操作系统等决定。
+>
+> 没有限制可创建线程数是很危险的。
+
+#### 6.2 Executor框架
+
+> 十分适合生产者-消费者模式
+
+##### 6.2.1 基于Executor的Web服务器
+
+```java
+class TaskExecutionWebServer{
+  private static final int NTHREADS = 100;
+  private static final Executor exec = Executors.newFixedThreadPool(NTHREADS);
+  public static void main(String[] args) throws IOException{
+    ServerSocket socket = new ServerSocket(80);
+    while(true){
+      Socket connection = socket.accept();
+      Runnable task = new Runnable(){
+        public void run(){
+           handleRequest(connection);
+        }
+      }
+     exec.execute(task);
+    }
+  }
+}
+```
+
+##### 6.2.2 执行策略
+
+> 执行策略定义了任务执行的额“What、Where、When、How”等方面，包括：
+>
+> - 在什么（What）线程中执行任务？
+> - 任务按照（What）顺序执行（FIFO、LIFO、优先级）
+> - 有多少个（How Many）任务能并发执行？
+> - 在队列中有多少个（How Many）任务在等待执行？
+> - 如果系统由于过载需要拒绝一个任务，那么应该选择哪个，另外如何通知？
+> - 在执行一个任务之前或之后，应该进行哪些（What）动作？
+
+> **每当看到下面这种形式的代码时：**
+>
+> **new Thread(runnable).start()**
+>
+> **并且你希望一种更灵活的执行策略时，请考虑使用Executor来代替Thread。**
+
+##### 6.2.3 线程池
+
+> **Executors中的线程池方法：**
+>
+> newFixedThreadPool：创建一个固定长度的线程池，当线程池达到最大数量时，将不再增加新线程。
+>
+> newCachedThreadPool：动态管理线程。
+>
+> newSingleThreadExecutor：是一个单线程的Executor。
+>
+> newScheduledThreadPool：创建了一个固定长度的线程池，而且以延迟或定时的方法来执行任务。
+
+##### 6.2.4 Executor的生命周期
+
+> ExecutorService定义了这些方法：
+>
+> ```java
+> /**
+>  * An {@link Executor} that provides methods to manage termination and
+>  * methods that can produce a {@link Future} for tracking progress of
+>  * one or more asynchronous tasks.
+>  */
+> ```
+>
+> 通过增加生命周期支持来扩展Web服务器的功能。可以通过两种形式停止服务(在程序中调用stop，或者以客户端请求形式向Web服务器发送一个特定格式的HTTP请求)
+
+```java
+class LifecycleWebServer{
+  private final ExecutorService exec = ...;
+  
+  public void start() throws IOException{
+    ServerSocket socket = new ServerSocket(80);
+    while(!exec.isShutdown()){
+      try{
+        final Socket conn = socket.accept();
+        exec.execute(new Runnable(){
+          public void run(){
+            HandleRequest(conn);
+          }
+        });
+      }catch(RejectedExecutionException e){
+        if(!exec.isShutdown()){
+          log("task submission rejected",e);
+        }
+      }
+    }
+  }
+  
+  public void stop(){ exec.shutdown();}
+  
+  void handleRequest(Socket conn){
+    Request req = readRequest(conn);
+    if(isShutdownRequest(req)){
+      stop();
+    }else{
+      dispatchRequest(req);
+    }
+  }
+}
+```
+
+##### 6.2.5 延迟任务与周期任务
+
+> Timer的问题：
+>
+> - 基于绝对时间调用而非相对时间，对系统时钟敏感
+>
+>
+> - 单线程处理定时任务（可能丢失任务调用）
+> - 出现异常没有一个很好的保证任务执行的机制
+>
+> **首先考虑ScheduledThreadPoolExecutor。**
+
+#### 6.3 找出可利用的并行性
+
+##### 6.3.1 示例：串行地页面渲染器
+
+> ```java
+> public class SingleThreadRender{
+>   void renderPage(CharSequence source){
+>     renderText(source);
+>     List<ImageData> imageData = new ArrayList<ImageData>();
+>     for(ImageInfo imageInfo: scanForImageInfo(source)){
+>       imageData.add(imageInfo.downloadImage());
+>     }
+>     for(ImageData data : imageData){
+>       renderImage(data);
+>     }
+>   }
+> }
+> ```
+
+##### 6.3.2 携带结果的任务Callable与Future
+
+![Callable和Future](./images/concurrent/6.3.2.jpg)

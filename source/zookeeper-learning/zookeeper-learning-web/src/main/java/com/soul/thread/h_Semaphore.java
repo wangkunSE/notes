@@ -6,7 +6,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Exchanger;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -61,6 +64,8 @@ public class h_Semaphore {
 //        } catch (InterruptedException e) {
 //            e.printStackTrace();
 //        }
+        Executors.newCachedThreadPool();
+        ExecutorService
         testListRemove();
     }
 
