@@ -65,7 +65,6 @@ public class h_Semaphore {
 //            e.printStackTrace();
 //        }
         Executors.newCachedThreadPool();
-        ExecutorService
         testListRemove();
     }
 

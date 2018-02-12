@@ -898,3 +898,117 @@ class LifecycleWebServer{
 ##### 6.3.2 携带结果的任务Callable与Future
 
 ![Callable和Future](./images/concurrent/6.3.2.jpg)
+
+##### 6.3.3 使用Future实现页面渲染器
+
+```java
+public class FutrueRender{
+  private final ExecutorService executor = ...;
+  
+  void renderPage(CharSequence source){
+    final List<ImageInfo> imageInfos = scanForImageInfo(source);
+    Callable<List<ImageInfo>> task = new Callable<>(){
+      public List<ImageData> call(){
+        List<ImageData> result = new ArrayList<ImageData>();
+        for(ImageInfo imageInfo: imageInfos){
+          result.add(imageInfo.downloadImage());
+        }
+        return result;
+      }
+    };
+    
+    Future<List<ImageData>> future = executor.submit(task);
+    renderText(source);
+    
+    try{
+      List<ImageData> imageData = future.get();
+      for(ImageData data : imageData){
+        renderImage(data);
+      }catch(InterruptedException e){
+        Thread.currentThread().interrupt();
+        future.cancel(true);
+      }
+    }
+  }
+}
+```
+
+> 该方法可以使得渲染文本任务与下载图像数据的任务并发地执行。当所有图像下载完后，会显示到页面上。但用户希望没下载完一副就立即显示出来。
+
+##### 6.3.4 在异构任务并行化中存在的局限
+
+> 只有当大量相互对立且同构的任务可以并发进行处理时，才能体现出将程序的工作负载分配到多个任务中带来的真正性能的提升。
+
+##### 6.3.5 CompletionService：Executor与BlockingQueue
+
+```java
+/**
+ * A {@link CompletionService} that uses a supplied {@link Executor}
+ * to execute tasks.  This class arranges that submitted tasks are,
+ * upon completion, placed on a queue accessible using {@code take}.
+ * The class is lightweight enough to be suitable for transient use
+ * when processing groups of tasks.
+ */
+```
+
+##### 6.3.6 使用CompletionService实现页面渲染器
+
+```java
+public class Render{
+  private final ExecutorService executor = ...;
+  
+  void renderPage(CharSequence source){
+    final List<ImageInfo> imageInfos = scanForImageInfo(source);
+    CompletionService<ImageInfo> completionService = new ExecutorCompletionService<ImageInfo>(executor);
+
+     for(ImageInfo imageInfo: imageInfos){
+       completionService.submit(new Callable<ImageData>(){
+         public ImageData call(){
+           return imageInfo.downloadImage();
+         }
+       });
+     }
+    renderText(source);
+    
+    try{
+      for ( int t = 0, n = info.size(); t < n; t++){
+        Future<ImageData> f = completionService.take();
+        ImageData imageData = f.get();
+        renderImage(imageData);
+      }
+      }catch(InterruptedException e){
+        Thread.currentThread().interrupt();
+        future.cancel(true);
+      }
+    }
+  }
+}
+```
+
+##### 6.3.7 为任务设置时限
+
+> 当超过一定时间后取消任务以节省计算资源和提高用户的响应度。如将从广告服务器获取广告的任务设置超时时间，超过时间后取消任务并使用默认广告。
+
+##### 6.3.8 旅行预定门户网站
+
+> Executor#invokeAll
+>
+> ```java
+>  /**
+>      * Executes the given tasks, returning a list of Futures holding
+>      * their status and results
+>      * when all complete or the timeout expires, whichever happens first.
+>      * {@link Future#isDone} is {@code true} for each
+>      * element of the returned list.
+>      * Upon return, tasks that have not completed are cancelled.
+>      * Note that a <em>completed</em> task could have
+>      * terminated either normally or by throwing an exception.
+>      * The results of this method are undefined if the given
+>      * collection is modified while this operation is in progress.
+>      */
+> ```
+
+#### 小结
+
+> 通过围绕任务执行来设计应用程序，可以简化开发过程，并有助于实现并发。
+
