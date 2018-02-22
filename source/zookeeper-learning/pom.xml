@@ -163,6 +163,14 @@
                 <artifactId>spring-retry</artifactId>
                 <version>1.1.2.RELEASE</version>
             </dependency>
+
+            <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>1.2.32</version>
+            </dependency>
+
         </dependencies>
 
 
