@@ -921,13 +921,14 @@ public class FutrueRender{
     renderText(source);
     
     try{
-      List<ImageData> imageData = future.get();
-      for(ImageData data : imageData){
-        renderImage(data);
-      }catch(InterruptedException e){
-        Thread.currentThread().interrupt();
-        future.cancel(true);
-      }
+          List<ImageData> imageData = future.get();
+          for(ImageData data : imageData){
+            renderImage(data);
+          }
+      	}catch(InterruptedException e){
+          Thread.currentThread().interrupt();
+          future.cancel(true);
+        }
     }
   }
 }
@@ -1012,3 +1013,71 @@ public class Render{
 
 > 通过围绕任务执行来设计应用程序，可以简化开发过程，并有助于实现并发。
 
+### 七 取消与关闭
+
+#### 7.1 任务取消
+
+> 取消的必要性：
+>
+> - 用户请求取消
+> - 有时间限制的操作
+> - 应用程序事件
+> - 错误
+> - 关闭
+
+> 取消策略：
+>
+> 在这个策略中将详细地定义取消操作的HOW（即其他代码如何请求取消该任务）;WHEN（任务在何时检查是否已经请求了取消）;（WHAT）以及在响应取消请求时应该执行哪些操作。
+
+##### 7.1.1 中断
+
+> 中断操作并不会真正的中断一个正在运行的线程，而只是发出中断请求，然后由线程在下一个合适的时刻中断自己。
+>
+> 通常，中断是实现取消的最合理方式。
+
+##### 7.1.2 中断策略
+
+> 由于每个线程拥有各自的中断策略，因此除非你知道中断对该线程的含义，否则就不应该中断这个线程。
+
+##### 7.1.3 响应中断
+
+> 只有实现了线程中断策略的代码才可以屏蔽中断请求。在常规的任务和库代码中都不应该屏蔽中断请求。
+
+##### 7.1.4 计时运行示例
+
+```java
+public static void timedRun(final Runnable r,long timeout,TimeUnit unit)
+  throws InterruptedException{
+  class RethrowableTask implements Runnable{
+    private volatile Throwable t;
+    public void run(){
+      try{
+        r.run();
+      }catch(Throwable t){
+        this.t = t;
+      }
+    }
+    void rethrow{
+      if(t!=null){
+        throw launderThrowable(t);
+      }
+    }
+  }
+  RethrowableTask task = new RethrowableTask();
+  final Thread taskThread = new Thread(task);
+  taskThread.start();
+  cancelExec.schedule(new Runnable(){
+    public void run(){
+      taskThread.interrupt();
+    }
+  },timeout,unit);
+  taskThread.join(unit.toMillis(timeout));
+  task.rethrow();
+}
+```
+
+> 以上方法存在join的不足，无法知道执行控制是因为线程正常退出而返回还是因为join超时而返回。
+
+##### 7.1.5 通过Future来实现取消
+
+> 
