@@ -1,15 +1,17 @@
 package com.soul.filter;
 
-import com.alibaba.fastjson.JSON;
 import com.soul.domain.User;
 import com.soul.webuser.WebUser;
 
-import javax.servlet.*;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Objects;
 
 public class TestFilter implements Filter {

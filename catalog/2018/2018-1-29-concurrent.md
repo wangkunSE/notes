@@ -1080,4 +1080,118 @@ public static void timedRun(final Runnable r,long timeout,TimeUnit unit)
 
 ##### 7.1.5 通过Future来实现取消
 
-> 
+> 当Future.get抛出InterruptedException或者TimeoutException时，如果你知道不再需要结果，那么就可以调用Future.cancel来取消任务。
+
+##### 7.1.6 处理不可中断的阻塞
+
+> - Socket I/O 可以直接关闭底层InputStream或者OutputStream
+> - 同步I/O 当中断一个正在InterruptibleChannel上等待的线程时，将抛出ClosedByInterruptException并关闭链路。
+> - Selector的异步I/O
+
+##### 7.1.7 采用newTaskFor来封装非标准的取消
+
+> ?
+
+#### 7.2 停止基于线程的服务
+
+> 线程有一个相应的所有者，即创建该线程的类。因此线程池是其工作者线程的所有者，要中断这些线程，那么应该使用线程池。
+>
+> **线程的所有权不可传递：因此服务应当提供生命周期方法来关闭他自己以及他所拥有的线程。**
+>
+> **对于持有线程的服务，只要服务的存在时间大于创建线程的方法的存在时间，那么就应该提供生命周期方法。**
+
+##### 7.2.1 示例：日志服务
+
+> 当取消一个生产者-消费者操作时，需要同时取消生产者和消费者。
+
+```java
+public class LogService{
+  private final BlockingQueue<String> queue;
+  private final LoggerThread loggerThread;
+  private final PrintWriter writer;
+  @GuardedBy("this") private boolean isShutdown;
+  @GuardedBy("this") private int reservations;
+  
+  public void start(){ loggerThread.start();}
+  
+  public void stop(){ 
+    synchronized(this){
+      isShutdown = true;
+    }
+    loggerThread.interrupt();
+  }
+  
+  public void log(String msg) throws InterruptedException{
+    synchronized(this){
+      if(isShutdown){
+        throw new IllegalStateException();
+      }
+      ++reservations;
+    }
+    queue.put(msg);
+  }
+  
+  private class LoggerThread extends Thread{
+    public void run(){
+      try{
+        while(true){
+          try{
+            synchronized(LogService.this){
+              if(isShutdown&&reservations == 0){
+                break;
+              }
+            }
+            String msg = queue.take();
+            synchronized(LogService.this){ --reservations; }
+            writer.println(msg);
+          }catch(InterruptedException e){ /* retry */}
+        }
+      }finally{
+        writer.close();
+      }
+    }
+  }
+}
+```
+
+##### 7.2.2 关闭ExecutorService
+
+> 强行关闭的速度快，但是风险也更大，正常关闭虽然速度慢， 但更安全。
+
+##### 7.2.3 "毒丸"对象
+
+> 毒丸对象是指一个放在队列上的对象，它的含义是“当得到这个对象时，立即停止”。
+>
+> **只有在生产者和消费者的数量都已知的情况下，才可以使用“毒丸”对象。**
+
+##### 7.2.4 示例：只执行一次的服务
+
+![使用私有Executor](./images/concurrent/7.2.4.jpg)
+
+##### 7.2.5 shutdownNow的局限性
+
+> 在于无法记录执行一半的任务，对于这些人物若想记录的话需要进行特殊处理。
+
+#### 7.3 处理非正常的线程终止
+
+> 如果任务抛出了一个未检查异常，那么它应当使线程终结，但会首先通知框架该线程已经终结。
+
+##### 未捕获异常的处理
+
+> 在运行时间较长的应用程序中，通常会为所有线程的未捕获异常指定同一个异常处理器，并且该处理器至少会将异常信息记录到日志中。
+
+#### 7.4 JVM关闭
+
+##### 7.4.1 关闭钩子
+
+> 正常关闭中，JVM先调用所有已注册的关闭钩子，关闭钩子值得是通过Runtime.addShutdownHook注册的但尚未开始的进程。
+
+##### 7.4.2 守护线程
+
+> 线程分为两种：**普通线程和守护线程**。当创建一个新线程时，新线程将继承创建它的线程的守护状态，因此默认情况下，主线程创建的所有线程都是普通线程。
+>
+> **应当尽可能少的使用守护线程**
+
+##### 7.4.3 终结器
+
+> finalize，不要使用终结器
