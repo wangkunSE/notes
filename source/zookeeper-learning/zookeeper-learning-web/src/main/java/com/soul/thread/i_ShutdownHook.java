@@ -10,14 +10,14 @@ public class i_ShutdownHook {
 
         @Override
         public void run() {
-            Runtime.getRuntime().addShutdownHook(new Thread() {
-                @Override
-                public void run() {
-                    System.out.println("Hook finished!!!");
-                }
-            });
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                System.out.println("Hook finished!!!");
+                System.out.println("(^^^^^^^^^___^^^^^^^^^^)");
+                Runtime.getRuntime().exit(1);
+            }));
             System.out.println("========================");
             System.out.println(Thread.currentThread().getName() + "    I am running!!");
+//            Runtime.getRuntime().exit(0);
             System.out.println("========================");
         }
     }
