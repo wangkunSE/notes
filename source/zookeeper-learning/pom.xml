@@ -163,7 +163,12 @@
                 <artifactId>spring-retry</artifactId>
                 <version>1.1.2.RELEASE</version>
             </dependency>
-
+            <!-- https://mvnrepository.com/artifact/com.itextpdf/itextpdf -->
+            <dependency>
+                <groupId>com.itextpdf</groupId>
+                <artifactId>itextpdf</artifactId>
+                <version>5.0.6</version>
+            </dependency>
             <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
             <dependency>
                 <groupId>com.alibaba</groupId>
