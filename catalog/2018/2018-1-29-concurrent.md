@@ -640,7 +640,7 @@ public class SafePoint{
 
 ##### 5.5.3 信号量
 
-> 计数信号量用来控制同时访问某个特定资源的操作数量，或者同事执行某个指定操作的数量。其可以用来实现某种资源池，或者对容器施加边界。
+> 计数信号量用来控制同时访问某个特定资源的操作数量，或者同时执行某个指定操作的数量。其可以用来实现某种资源池，或者对容器施加边界。
 >
 > Semaphore管理着一组虚拟的许可，许可的初始数量可通过构造函数来指定。
 >
@@ -934,7 +934,7 @@ public class FutrueRender{
 }
 ```
 
-> 该方法可以使得渲染文本任务与下载图像数据的任务并发地执行。当所有图像下载完后，会显示到页面上。但用户希望没下载完一副就立即显示出来。
+> 该方法可以使得渲染文本任务与下载图像数据的任务并发地执行。当所有图像下载完后，会显示到页面上。但用户希望每下载完一副就立即显示出来。
 
 ##### 6.3.4 在异构任务并行化中存在的局限
 
@@ -1170,7 +1170,7 @@ public class LogService{
 
 ##### 7.2.5 shutdownNow的局限性
 
-> 在于无法记录执行一半的任务，对于这些人物若想记录的话需要进行特殊处理。
+> 在于无法记录执行一半的任务，对于这些任务若想记录的话需要进行特殊处理。
 
 #### 7.3 处理非正常的线程终止
 
@@ -1195,4 +1195,170 @@ public class LogService{
 ##### 7.4.3 终结器
 
 > finalize，不要使用终结器
+
+### 八 线程池的使用
+
+#### 8.1 在任务与执行策略之间的隐性耦合
+
+> 一些类型的任务需要明确地指定执行策略，包括：
+>
+> - 依赖性任务
+> - 使用线程封闭机制的任务
+> - 对响应时间敏感的任务
+> - 使用ThreadLocal的任务：在线程池的线程中ThreadLocal不应当用来在任务间传递值。
+
+##### 8.1.1 线程饥饿死锁
+
+> 当一个正在运行的线程依赖于在等待队列中的线程的提交结果时，就会发生死锁。
+>
+> **每当提交了一个有依赖性的Executor任务时，要清楚地知道可能会出现的“饥饿”死锁。**
+
+##### 8.1.2 运行时间较长的任务
+
+> 若线程池中含有运行时间较长的任务，则也会对运行时间较短的任务造成影响。
+
+#### 8.2 设置线程池的大小
+
+> 对于计算密集型任务，在拥有N个处理器的系统上，当线程池的大小为N+1时，通常能实现最优的利用率。
+>
+> $$N_{cpu} = numberOfCpus $$
+>
+> $$ U_{cpu} = target CPU utilization ,0\le U_{cpu} \le 1 $$
+>
+> $$\frac{W}{C} = ratioOfWaitTimeToCmpputeTime $$
+>
+> **最优大小：**
+>
+> **$$N_{threads}=N_{cpu} * U_{cpu} *  \left( 1+\frac{W}{C} \right)$$**  
+>
+> 同样其他资源也应当考虑在内，如JDBC连接池。
+
+#### 8.3 配置ThreadPoolExecutor
+
+> ```java
+>  /* An {@link ExecutorService} that executes each submitted task using
+>  * one of possibly several pooled threads, normally configured
+>  * using {@link Executors} factory methods.
+>  *
+>  * <p>Thread pools address two different problems: they usually
+>  * provide improved performance when executing large numbers of
+>  * asynchronous tasks, due to reduced per-task invocation overhead,
+>  * and they provide a means of bounding and managing the resources,
+>  * including threads, consumed when executing a collection of tasks.
+>  * Each {@code ThreadPoolExecutor} also maintains some basic
+>  * statistics, such as the number of completed tasks.
+>  */
+> ```
+
+##### 8.3.1 线程的创建与销毁
+
+> ```java
+> /**
+>      * Creates a new {@code ThreadPoolExecutor} with the given initial
+>      * parameters.
+>      *
+>      * @param corePoolSize the number of threads to keep in the pool, even
+>      *        if they are idle, unless {@code allowCoreThreadTimeOut} is set
+>      * @param maximumPoolSize the maximum number of threads to allow in the
+>      *        pool
+>      * @param keepAliveTime when the number of threads is greater than
+>      *        the core, this is the maximum time that excess idle threads
+>      *        will wait for new tasks before terminating.
+>      * @param unit the time unit for the {@code keepAliveTime} argument
+>      * @param workQueue the queue to use for holding tasks before they are
+>      *        executed.  This queue will hold only the {@code Runnable}
+>      *        tasks submitted by the {@code execute} method.
+>      * @param threadFactory the factory to use when the executor
+>      *        creates a new thread
+>      * @param handler the handler to use when execution is blocked
+>      *        because the thread bounds and queue capacities are reached
+>      * @throws IllegalArgumentException if one of the following holds:<br>
+>      *         {@code corePoolSize < 0}<br>
+>      *         {@code keepAliveTime < 0}<br>
+>      *         {@code maximumPoolSize <= 0}<br>
+>      *         {@code maximumPoolSize < corePoolSize}
+>      * @throws NullPointerException if {@code workQueue}
+>      *         or {@code threadFactory} or {@code handler} is null
+>      */
+>     public ThreadPoolExecutor(int corePoolSize,
+>                               int maximumPoolSize,
+>                               long keepAliveTime,
+>                               TimeUnit unit,
+>                               BlockingQueue<Runnable> workQueue,
+>                               ThreadFactory threadFactory,
+>                               RejectedExecutionHandler handler)
+> ```
+
+##### 8.3.2 管理队列任务
+
+> 对于非常大的或者无界的线程池，可以通过**SynchronousQueue**来避免任务排队。
+
+##### 8.3.3 饱和策略
+
+> AbortPolicy：终止策略
+>
+> DiscardPolicy：抛弃策略
+>
+> DiscardOldestPolicy：抛弃最旧任务策略。避免和优先级队列同时使用。
+>
+> CallerRunsPolicy：调用者运行策略：当线程池满时，让开启线程的调用者运行这个任务。
+
+##### 8.3.4 线程工厂
+
+> 每当线程池需要创建一个线程时，都是通过线程工厂方法来完成的。
+
+##### 8.3.5 在调用构造函数后再定制ThreadPoolExecutor
+
+> 可以通过强制转换后设置线程池的属性。所以若将ExecutorService暴露给不信任的代码，又不希望对其进行修改，就可以通过unconfigurableExecutorService来包装。
+
+#### 8.4 扩展ThreadPoolExecutor
+
+> 该类中含有beforeExecute、afterExecute、terminated三个方法可供扩展。其中afterExecute方法任务无论是从run中正常返回，还是抛出一个异常而返回，afterExecute都会被调用。但是任务带有一个Error或者beforeExecute抛出一个RuntimeException，那么afterExecute就不会被调用。
+
+##### 示例：给线程池添加统计信息
+
+> ```java
+> public class k_ExtendThreadPoolExecutor extends ThreadPoolExecutor {
+>
+>     public k_ExtendThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
+>         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
+>     }
+>
+>     private final ThreadLocal<Long> startTime = new ThreadLocal<>();
+>     private final Logger log = LoggerFactory.getLogger(getClass());
+>     private final AtomicLong numTasks = new AtomicLong();
+>     private final AtomicLong totalTime = new AtomicLong();
+>
+>     @Override
+>     protected void beforeExecute(Thread t, Runnable r) {
+>         super.beforeExecute(t, r);
+>         log.info(String.format("Thread %s : start %s", t, r));
+>         startTime.set(System.nanoTime());
+>     }
+>
+>     @Override
+>     protected void afterExecute(Runnable r, Throwable t) {
+>         try {
+>             long endTime = System.nanoTime();
+>             long taskTime = endTime - startTime.get();
+>             numTasks.incrementAndGet();
+>             totalTime.addAndGet(taskTime);
+>             log.info(String.format("Thread %s : end %s , time=%dns", t, r, taskTime));
+>         } finally {
+>             super.afterExecute(r, t);
+>         }
+>     }
+>
+>     @Override
+>     protected void terminated() {
+>         try {
+>             log.info(String.format("Terminated: avg time=%dns", totalTime.get() / numTasks.get()));
+>         } finally {
+>             super.terminated();
+>         }
+>     }
+> }
+> ```
+>
+> 
 
