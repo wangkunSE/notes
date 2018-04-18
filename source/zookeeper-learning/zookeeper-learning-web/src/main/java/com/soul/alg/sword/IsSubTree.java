@@ -25,7 +25,7 @@ public class IsSubTree {
 
     public static void main(String[] args) {
         Integer[] arrA = {8, 8, 7, 9, 2, -1, -1, -1, -1, 4, 7};
-        Integer[] arrB = {8, 9, 2};
+        Integer[] arrB = {2, 4, 7};
         IsSubTree isSubTree = new IsSubTree();
         TreeNode A = isSubTree.buildTree(arrA);
         TreeNode B = isSubTree.buildTree(arrB);
@@ -50,38 +50,41 @@ public class IsSubTree {
 
     private void reduceNullNode(TreeNode treeNode) {
         if (treeNode != null) {
-            if (treeNode.val == -1) {
-                treeNode = null;
-            } else {
-                reduceNullNode(treeNode.leftChild);
-                reduceNullNode(treeNode.rightChild);
+            if (treeNode.leftChild != null && treeNode.leftChild.val == -1) {
+                treeNode.leftChild = null;
             }
+            if (treeNode.rightChild != null && treeNode.rightChild.val == -1) {
+                treeNode.rightChild = null;
+            }
+            reduceNullNode(treeNode.leftChild);
+            reduceNullNode(treeNode.rightChild);
         }
     }
 
     private boolean isSubTree(TreeNode source, TreeNode target) {
+        boolean result = false;
         if (source != null && target != null) {
             if (Objects.equals(source.val, target.val)) {
-                if (isChildStructure(source, target)) {
-                    return true;
-                } else {
-                    isSubTree(source.leftChild, target);
-                    isSubTree(source.rightChild, target);
-                }
+                result = isChildStructure(source, target);
+            }
+            if (!result) {
+                result = isSubTree(source.leftChild, target);
+            }
+            if (!result) {
+                result = isSubTree(source.rightChild, target);
             }
         }
-        return false;
+        return result;
     }
 
     private boolean isChildStructure(TreeNode source, TreeNode target) {
-        if (source != null && target != null) {
-            if (!Objects.equals(source.val, target.val)) {
-                return false;
-            } else {
-                isChildStructure(source.leftChild, target.leftChild);
-                isChildStructure(source.rightChild, target.rightChild);
-            }
+        if (target == null) {
+            return true;
         }
-        return true;
+        if (source == null) {
+            return false;
+        }
+        return Objects.equals(source.val, target.val) && isChildStructure(source.leftChild, target.leftChild) &&
+                isChildStructure(source.rightChild, target.rightChild);
     }
 }
