@@ -1,5 +1,7 @@
 package com.soul.alg.sword;
 
+import com.soul.alg.datastructure.TreeNode;
+
 import java.util.Objects;
 
 /**
@@ -8,58 +10,17 @@ import java.util.Objects;
  */
 public class IsSubTree {
 
-    private static class TreeNode {
-        Integer val;
-        TreeNode leftChild;
-        TreeNode rightChild;
-
-        public TreeNode() {
-        }
-
-        public TreeNode(int val, TreeNode leftChild, TreeNode rightChild) {
-            this.val = val;
-            this.leftChild = leftChild;
-            this.rightChild = rightChild;
-        }
-    }
 
     public static void main(String[] args) {
         Integer[] arrA = {8, 8, 7, 9, 2, -1, -1, -1, -1, 4, 7};
         Integer[] arrB = {2, 4, 7};
         IsSubTree isSubTree = new IsSubTree();
-        TreeNode A = isSubTree.buildTree(arrA);
-        TreeNode B = isSubTree.buildTree(arrB);
+        TreeNode A = TreeNode.buildTree(arrA, -1);
+        TreeNode B = TreeNode.buildTree(arrB, -1);
         boolean subTree = isSubTree.isSubTree(A, B);
         System.out.println(subTree);
     }
 
-    private TreeNode buildTree(Integer[] arrA) {
-        TreeNode[] root = new TreeNode[arrA.length];
-        for (int i = 0; i < arrA.length; i++) {
-            root[i] = new TreeNode(arrA[i], null, null);
-        }
-        for (int i = 0; i < (arrA.length / 2); i++) {
-            root[i].leftChild = root[2 * i + 1];
-            if ((2 * i + 2) < arrA.length) {
-                root[i].rightChild = root[2 * i + 2];
-            }
-        }
-        reduceNullNode(root[0]);
-        return root[0];
-    }
-
-    private void reduceNullNode(TreeNode treeNode) {
-        if (treeNode != null) {
-            if (treeNode.leftChild != null && treeNode.leftChild.val == -1) {
-                treeNode.leftChild = null;
-            }
-            if (treeNode.rightChild != null && treeNode.rightChild.val == -1) {
-                treeNode.rightChild = null;
-            }
-            reduceNullNode(treeNode.leftChild);
-            reduceNullNode(treeNode.rightChild);
-        }
-    }
 
     private boolean isSubTree(TreeNode source, TreeNode target) {
         boolean result = false;
