@@ -47,4 +47,12 @@ public class TreeNode {
             reduceNullNode(treeNode.rightChild, reduceElement);
         }
     }
+
+    public static void preOrderTravel(TreeNode root) {
+        if (root != null) {
+            System.out.println(root.val);
+            preOrderTravel(root.leftChild);
+            preOrderTravel(root.rightChild);
+        }
+    }
 }
