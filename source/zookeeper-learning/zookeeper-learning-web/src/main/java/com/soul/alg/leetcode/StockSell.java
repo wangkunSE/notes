@@ -11,8 +11,9 @@ public class StockSell {
     public static void main(String[] args) {
 //        int[] prices = {1, 2, 4, 2, 5, 7, 2, 4, 9, 0};
 //        int[] prices = {3, 3, 5, 0, 0, 3, 1, 4};
-        int[] prices = {1, 3, 2, 8, 4, 9};
-        int maxProfit = new TransactionWithFee().maxProfit(prices,2);
+//        int[] prices = {1, 3, 2, 8, 4, 9};
+        int[] prices = {1, 2, 3, 4, 5};
+        int maxProfit = new TwoTraverses().maxProfit(prices);
 //        int maxProfit = new Third().maxProfit(prices);
         System.out.println(maxProfit);
     }
@@ -74,13 +75,17 @@ public class StockSell {
             int maxProfit = 0;
             int rightMaxProfit = 0;
             int rightMax = prices[length - 1];
-            for (int i = length - 1; i >= 0; i--) {
-                if (prices[i] > rightMax) rightMax = prices[i];
-                if (rightMax - prices[i] > rightMaxProfit) rightMaxProfit = rightMax - prices[i];
-                int currentProfit = rightMaxProfit + (i > 0 ? leftProfit[i - 1] : 0);
-                if (currentProfit > maxProfit) {
-                    maxProfit = currentProfit;
-                }
+//            for (int i = length - 1; i >= 0; i--) {
+//                if (prices[i] > rightMax) rightMax = prices[i];
+//                if (rightMax - prices[i] > rightMaxProfit) rightMaxProfit = rightMax - prices[i];
+//                int currentProfit = rightMaxProfit + (i > 0 ? leftProfit[i - 1] : 0);
+//                if (currentProfit > maxProfit) {
+//                    maxProfit = currentProfit;
+//                }
+//            }
+            for (int i = length - 2; i >= 0; i--) {
+                rightMax = Math.max(rightMax, prices[i]);
+                maxProfit = Math.max(maxProfit, leftProfit[i] + rightMax - prices[i]);
             }
 
             return maxProfit;
