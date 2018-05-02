@@ -18,11 +18,11 @@ public class PrintImageTree {
 
     private void printImageTree(TreeNode root) {
         if (root != null) {
-            TreeNode temp = root.leftChild;
-            root.leftChild = root.rightChild;
-            root.rightChild = temp;
-            printImageTree(root.leftChild);
-            printImageTree(root.rightChild);
+            TreeNode temp = root.left;
+            root.left = root.right;
+            root.right = temp;
+            printImageTree(root.left);
+            printImageTree(root.right);
         }
     }
 }

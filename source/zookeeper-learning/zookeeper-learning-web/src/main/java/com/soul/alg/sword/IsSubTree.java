@@ -29,10 +29,10 @@ public class IsSubTree {
                 result = isChildStructure(source, target);
             }
             if (!result) {
-                result = isSubTree(source.leftChild, target);
+                result = isSubTree(source.left, target);
             }
             if (!result) {
-                result = isSubTree(source.rightChild, target);
+                result = isSubTree(source.right, target);
             }
         }
         return result;
@@ -45,7 +45,7 @@ public class IsSubTree {
         if (source == null) {
             return false;
         }
-        return Objects.equals(source.val, target.val) && isChildStructure(source.leftChild, target.leftChild) &&
-                isChildStructure(source.rightChild, target.rightChild);
+        return Objects.equals(source.val, target.val) && isChildStructure(source.left, target.left) &&
+                isChildStructure(source.right, target.right);
     }
 }

@@ -8,16 +8,16 @@ import java.util.Objects;
  */
 public class TreeNode {
     public Integer val;
-    public TreeNode leftChild;
-    public TreeNode rightChild;
+    public TreeNode left;
+    public TreeNode right;
 
     public TreeNode() {
     }
 
-    public TreeNode(int val, TreeNode leftChild, TreeNode rightChild) {
+    public TreeNode(int val, TreeNode left, TreeNode right) {
         this.val = val;
-        this.leftChild = leftChild;
-        this.rightChild = rightChild;
+        this.left = left;
+        this.right = right;
     }
 
     public static TreeNode buildTree(Integer[] arrA, Integer reduceElement) {
@@ -26,9 +26,9 @@ public class TreeNode {
             root[i] = new TreeNode(arrA[i], null, null);
         }
         for (int i = 0; i < (arrA.length / 2); i++) {
-            root[i].leftChild = root[2 * i + 1];
+            root[i].left = root[2 * i + 1];
             if ((2 * i + 2) < arrA.length) {
-                root[i].rightChild = root[2 * i + 2];
+                root[i].right = root[2 * i + 2];
             }
         }
         reduceNullNode(root[0], reduceElement);
@@ -37,22 +37,22 @@ public class TreeNode {
 
     public static void reduceNullNode(TreeNode treeNode, Integer reduceElement) {
         if (treeNode != null) {
-            if (treeNode.leftChild != null && Objects.equals(treeNode.leftChild.val, reduceElement)) {
-                treeNode.leftChild = null;
+            if (treeNode.left != null && Objects.equals(treeNode.left.val, reduceElement)) {
+                treeNode.left = null;
             }
-            if (treeNode.rightChild != null && Objects.equals(treeNode.rightChild.val, reduceElement)) {
-                treeNode.rightChild = null;
+            if (treeNode.right != null && Objects.equals(treeNode.right.val, reduceElement)) {
+                treeNode.right = null;
             }
-            reduceNullNode(treeNode.leftChild, reduceElement);
-            reduceNullNode(treeNode.rightChild, reduceElement);
+            reduceNullNode(treeNode.left, reduceElement);
+            reduceNullNode(treeNode.right, reduceElement);
         }
     }
 
     public static void preOrderTravel(TreeNode root) {
         if (root != null) {
             System.out.println(root.val);
-            preOrderTravel(root.leftChild);
-            preOrderTravel(root.rightChild);
+            preOrderTravel(root.left);
+            preOrderTravel(root.right);
         }
     }
 }

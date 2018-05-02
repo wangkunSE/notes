@@ -25,11 +25,11 @@ public class TopToDownTravelTree {
         while (queue.size() > 0) {
             TreeNode temp = queue.poll();
             System.out.println(temp.val);
-            if (temp.leftChild != null) {
-                queue.add(temp.leftChild);
+            if (temp.left != null) {
+                queue.add(temp.left);
             }
-            if (temp.rightChild != null) {
-                queue.add(temp.rightChild);
+            if (temp.right != null) {
+                queue.add(temp.right);
             }
         }
     }
