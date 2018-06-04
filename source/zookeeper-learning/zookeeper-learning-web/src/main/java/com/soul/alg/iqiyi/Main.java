@@ -1,4 +1,4 @@
-package com.soul.iqiyi;
+package com.soul.alg.iqiyi;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.soul.toutiao;
+package com.soul.alg.toutiao;
 
 import java.util.ArrayList;
 import java.util.Collections;

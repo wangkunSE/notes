@@ -2,7 +2,6 @@ package com.soul.java8;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 /***
@@ -11,16 +10,16 @@ import java.util.function.Predicate;
  */
 public class Java8Tester {
     public static void main(String args[]) {
-        List<Integer> list = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9);
-//        evalTest(list);
+        List<Integer> list = Arrays.asList(1, 2, 3, 4);
+        evalTest(list);
 //        list.forEach(System.out::println);
-        Integer sum = list.stream()
-                .filter(n -> n % 2 == 0)
-                .map(n -> n * 2)
-                .filter(n -> n > 5)
-                .reduce((x, y) -> x + y)
-                .get();
-        System.out.println(sum);
+//        Integer sum = list.stream()
+//                .filter(n -> n % 2 == 0)
+//                .map(n -> n * 2)/*
+//                .filter(n -> n > 5)*/
+//                .reduce((x, y) -> x + y)
+//                .get();
+//        System.out.println(sum);
 
     }
 
@@ -50,11 +49,6 @@ public class Java8Tester {
     }
 
     public static void eval(List<Integer> list, Predicate<Integer> predicate) {
-        for (Integer n : list) {
-
-            if (predicate.test(n)) {
-                System.out.println(n + " ");
-            }
-        }
+        list.stream().filter(predicate).forEach(System.out::println);
     }
 }
