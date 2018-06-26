@@ -15,9 +15,14 @@ import java.util.ListIterator;
 public class Parenthess {
 
     public static void main(String[] args) {
-        int n = 20;
-        List<String> strings = new First().generateParenthesis(n);
-        System.out.println(strings);
+//        int n = 20;
+//        List<String> strings = new First().generateParenthesis(n);
+//        System.out.println(strings);
+        String[] split = "asdasd$#asdasd".split("###");
+        int pow = (int) Math.pow(2, 3);
+        for (String s : split) {
+            System.out.println(s);
+        }
     }
 
     private static class First {
