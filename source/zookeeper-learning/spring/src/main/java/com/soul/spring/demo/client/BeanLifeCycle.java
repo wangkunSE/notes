@@ -31,6 +31,7 @@ public class BeanLifeCycle {
 
         Car car1 = (Car) applicationContext.getBean("car");
         System.out.println(car == car1);
+        ((ClassPathXmlApplicationContext) applicationContext).destroy();
 
 
     }

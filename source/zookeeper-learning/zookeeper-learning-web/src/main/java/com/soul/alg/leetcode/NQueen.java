@@ -1,10 +1,6 @@
 package com.soul.alg.leetcode;
 
-import scala.Array;
-
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 /**
