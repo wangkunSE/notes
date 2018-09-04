@@ -42,7 +42,7 @@ public class b_ZookeeperCreate implements Watcher {
     }
 
     private static ZooKeeper getZooKeeper() throws IOException, InterruptedException {
-        ZooKeeper zooKeeper = new ZooKeeper(Constants.ZOOKEEPER_FAKE_CLUSTER_SERVER_PATH, 5000, new b_ZookeeperCreate());
+        ZooKeeper zooKeeper = new ZooKeeper(Constants.ZOOKEEPER_DOCKER_CLUSTER_SERVER_PATH, 5000, new b_ZookeeperCreate());
         countDownLatch.await();
         return zooKeeper;
     }

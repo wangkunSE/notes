@@ -7,6 +7,7 @@ import org.apache.zookeeper.ZooKeeper;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
+import static com.soul.zookeeper.constants.Constants.ZOOKEEPER_DOCKER_CLUSTER_SERVER_PATH;
 import static com.soul.zookeeper.constants.Constants.ZOOKEEPER_FAKE_CLUSTER_SERVER_PATH;
 
 /***
@@ -19,7 +20,7 @@ public class a_ZookeeperClient implements Watcher {
 
     public static void main(String[] args) {
         try {
-            ZooKeeper zooKeeper = new ZooKeeper(ZOOKEEPER_FAKE_CLUSTER_SERVER_PATH, 50000, new a_ZookeeperClient());
+            ZooKeeper zooKeeper = new ZooKeeper(ZOOKEEPER_DOCKER_CLUSTER_SERVER_PATH, 50000, new a_ZookeeperClient());
             System.out.println(zooKeeper.getState());
             try {
                 countDownLatch.await();
