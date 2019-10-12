@@ -55,4 +55,25 @@ public class TreeNode {
             preOrderTravel(root.right);
         }
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (Objects.isNull(obj)) {
+            return false;
+        }
+        if (!(obj instanceof TreeNode)) {
+            return false;
+        }
+
+        TreeNode curObj = (TreeNode) obj;
+
+        return Objects.equals(curObj.val, this.val)
+                && Objects.equals(curObj.left, this.left)
+                && Objects.equals(curObj.right, this.right);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.val) + Objects.hashCode(this.left) + Objects.hashCode(this.right);
+    }
 }
