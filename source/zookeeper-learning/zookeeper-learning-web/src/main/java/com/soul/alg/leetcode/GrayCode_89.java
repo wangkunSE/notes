@@ -16,16 +16,16 @@ public class GrayCode_89 {
     }
 
     public List<Integer> grayCode(int n) {
-        if (n <= 0) {
-            return Arrays.asList(0);
+        List<Integer> rs = new ArrayList<Integer>();
+        rs.add(0);
+        for (int i = 0; i < n; i++) {
+            int size = rs.size();
+            for (int k = size - 1; k >= 0; k--) {
+                int moveLeft = 1 << i;
+                int curNum = rs.get(k) | moveLeft;
+                rs.add(curNum);
+            }
         }
-
-        List<Integer> result = new ArrayList<>();
-
-        for (int i = 0; i < Math.pow(2, n); i++) {
-            result.add(i);
-        }
-
-        return result;
+        return rs;
     }
 }
