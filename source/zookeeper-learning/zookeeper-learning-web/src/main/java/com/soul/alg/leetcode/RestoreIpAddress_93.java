@@ -57,6 +57,7 @@ public class RestoreIpAddress_93 {
                     }
                     ipSplit.add(substring);
                     findAllIp(result, s.substring(i), ipSplit);
+
                     ipSplit.remove(ipSplit.size() - 1);
                 }
             }
