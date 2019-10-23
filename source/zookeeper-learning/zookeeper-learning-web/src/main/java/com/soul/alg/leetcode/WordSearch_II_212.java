@@ -10,6 +10,11 @@ import java.util.List;
 public class WordSearch_II_212 {
 
     public static void main(String[] args) {
+//        testFindWords();
+        System.out.println(10142909L/1024/1024);
+    }
+
+    private static void testFindWords() {
         char[][] board = new char[][]{
                 {'o', 'a', 'a', 'n'},
                 {'e', 't', 'a', 'e'},
