@@ -1,5 +1,7 @@
 package com.soul.alg.leetcode2.array;
 
+import com.soul.alg.leetcode2.AbstractAlg;
+
 /**
  * @author wangkunwk
  * @version 2020/8/6

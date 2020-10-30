@@ -86,25 +86,25 @@ public class MinSizeOfSubArraySum {
     }
 
 
-    static class SolutionII{
+    static class SolutionII {
         public int minSubArrayLen(int s, int[] nums) {
-            if (nums.length ==0) {
+            if (nums.length == 0) {
                 return 0;
             }
             int curSum = nums[0];
             int left = 0, right = 1;
             int result = Integer.MAX_VALUE;
-            while(left < nums.length) {
-                while(right < nums.length && curSum < s) {
+            while (left < nums.length) {
+                while (right < nums.length && curSum < s) {
                     //keep adding numbers into curSum
-                    curSum+=nums[right];
+                    curSum += nums[right];
                     right++;
                 }
                 if (curSum >= s) {
                     result = Math.min(result, right - left);
 
                 }
-                curSum-=nums[left];
+                curSum -= nums[left];
                 //removing nums[left] from curSum
                 left++;
 
@@ -115,8 +115,10 @@ public class MinSizeOfSubArraySum {
 
     public static void main(String[] args) {
         Solution solution = new Solution();
+        SolutionII solution2 = new SolutionII();
         int[] arr = new int[]{12, 28, 83, 4, 25, 26, 25, 2, 25, 25, 25, 12};
         int subArrayLen = solution.minSubArrayLen(213, arr);
         System.out.println(subArrayLen);
+        System.out.println(solution2.minSubArrayLen(213, arr));
     }
 }

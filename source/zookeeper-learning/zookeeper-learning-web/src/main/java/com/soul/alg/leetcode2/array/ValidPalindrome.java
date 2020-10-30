@@ -1,6 +1,6 @@
 package com.soul.alg.leetcode2.array;
 
-import com.soul.alg.tencet.Soultion;
+import com.soul.alg.leetcode2.AbstractAlg;
 
 /**
  * @author wangkunwk

@@ -1,5 +1,6 @@
 package com.soul.alg.leetcode2.array;
 
+import com.soul.alg.leetcode2.AbstractAlg;
 import java.util.ArrayList;
 import java.util.List;
 

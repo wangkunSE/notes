@@ -1,10 +1,12 @@
 package com.soul.alg.leetcode2.array;
 
+import com.soul.alg.leetcode2.AbstractAlg;
+
 /**
  * @author wangkunwk
  * @version 2020/8/6
  */
-public class ReverseString extends AbstractAlg{
+public class ReverseString extends AbstractAlg {
     private static class Solution {
         public void reverseString(char[] s) {
             if (null == s || s.length<1){

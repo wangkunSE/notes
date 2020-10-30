@@ -18,7 +18,7 @@ public class InviteCodeUtils {
             }
             resultChars[k] = Character.highSurrogate(result);
         }
-        System.out.println(resultChars);
+        System.out.println(new String(resultChars));
 
     }
 }
