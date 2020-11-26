@@ -3,9 +3,9 @@ package com.soul.alg.leetcode2;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import sun.misc.Unsafe;
 
 /**
@@ -33,6 +33,63 @@ public class AbstractAlg {
             this.val = val;
             this.left = left;
             this.right = right;
+        }
+
+        public static TreeNode buildTree(Integer[] arrA, Integer reduceElement) {
+            TreeNode[] root = new TreeNode[arrA.length];
+            for (int i = 0; i < arrA.length; i++) {
+                root[i] = new TreeNode(arrA[i], null, null);
+            }
+            for (int i = 0; i < (arrA.length / 2); i++) {
+                root[i].left = root[2 * i + 1];
+                if ((2 * i + 2) < arrA.length) {
+                    root[i].right = root[2 * i + 2];
+                }
+            }
+            reduceNullNode(root[0], reduceElement);
+            return root[0];
+        }
+
+        public static void reduceNullNode(TreeNode treeNode, Integer reduceElement) {
+            if (treeNode != null) {
+                if (treeNode.left != null && Objects.equals(treeNode.left.val, reduceElement)) {
+                    treeNode.left = null;
+                }
+                if (treeNode.right != null && Objects.equals(treeNode.right.val, reduceElement)) {
+                    treeNode.right = null;
+                }
+                reduceNullNode(treeNode.left, reduceElement);
+                reduceNullNode(treeNode.right, reduceElement);
+            }
+        }
+
+        public static void preOrderTravel(TreeNode root) {
+            if (root != null) {
+                System.out.println(root.val);
+                preOrderTravel(root.left);
+                preOrderTravel(root.right);
+            }
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (Objects.isNull(obj)) {
+                return false;
+            }
+            if (!(obj instanceof TreeNode)) {
+                return false;
+            }
+
+            TreeNode curObj = (TreeNode) obj;
+
+            return Objects.equals(curObj.val, this.val)
+                    && Objects.equals(curObj.left, this.left)
+                    && Objects.equals(curObj.right, this.right);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(this.val) + Objects.hashCode(this.left) + Objects.hashCode(this.right);
         }
     }
 
