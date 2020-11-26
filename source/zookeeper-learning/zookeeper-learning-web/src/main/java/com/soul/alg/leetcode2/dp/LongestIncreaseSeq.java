@@ -36,8 +36,35 @@ public class LongestIncreaseSeq {
 
     }
 
+    static class SolutionII {
+        public int getLongestIncreaseSeq(int[] arr) {
+
+            if (Objects.isNull(arr) || arr.length < 1) {
+                return 0;
+            }
+
+            int[] dp = new int[arr.length];
+
+            int max = 0;
+
+            for (int i = 0; i < arr.length; i++) {
+                dp[i] = 1;
+
+                if (i > 0 && arr[i] > arr[i - 1]) {
+                    dp[i] = dp[i - 1] + 1;
+                }
+
+                max = Math.max(dp[i], max);
+
+            }
+            return max;
+        }
+
+
+    }
+
     public static void main(String[] args) {
-        Solution solution = new Solution();
+        SolutionII solution = new SolutionII();
 
         int[] arr = new int[]{2, 1, 5, 3, 6, 4, 8, 9, 7};
 
